@@ -77,14 +77,15 @@ async def ready() -> Response:
         }
     )
 
+    if COOLDOWN:
+        if len(clients) >= MIN_CLIENTS:
+            return Response(data, status_code=503)
+
+        COOLDOWN = False
+        return Response(data, status_code=200)
+
     if len(clients) >= MAX_CLIENTS:
         COOLDOWN = True
-        return Response(data, status_code=503)
-
-    if COOLDOWN:
-        if len(clients) < MIN_CLIENTS:
-            COOLDOWN = False
-            return Response(data, status_code=200)
         return Response(data, status_code=503)
 
     return Response(data, status_code=200)
